@@ -15,15 +15,15 @@ The FinBERT model is finetuned using the preprocessed dataset mentioned above. T
 
 ## Kaggle Live Finetuning Process
 
-Additionally, a Kaggle notebook is available for the finetuning process, which was executed on CPU instances. Despite the hardware limitations, the finetuning process on Kaggle achieved a respectable accuracy of 79%. You can access the live finetuning process [here](https://www.kaggle.com/code/meruvulikith/finbert-fine-tuning).
+Additionally, a Kaggle notebook is available for the finetuning process, which was executed on CPU instances. Despite the hardware limitations, the finetuning process on Kaggle achieved a respectable accuracy of 79%. You can access the live finetuning process [Kaggle Notebook](https://www.kaggle.com/code/meruvulikith/finbert-fine-tuning).
 
 ## Hosted Application
 
-The finetuned model is deployed as an application for easy access and usage. You can interact with the sentiment analysis model through the hosted app. The link to the hosted application will be provided [here](https://www.kaggle.com/code/meruvulikith/finbert-fine-tuning).
+The finetuned model is deployed as an application for easy access and usage. You can interact with the sentiment analysis model through the hosted app. The link to the hosted application will be provided [StreamLit APP](https://stock-sentiment-finbert.streamlit.app).
 
 ## Finetuned Model
 
-If you prefer to download and use the finetuned model, it is available on the Hugging Face model hub. You can access the model card [here](https://huggingface.co/likith123/SSAF-FinBert).
+If you prefer to download and use the finetuned model, it is available on the Hugging Face model hub. You can access the model card [HuggingFace Model Card](https://huggingface.co/likith123/SSAF-FinBert).
 
 ## About FinBERT
 
