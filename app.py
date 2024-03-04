@@ -1,27 +1,11 @@
 import streamlit as st
-from transformers import AutoModelForSequenceClassification, AutoTokenizer
-import torch
+import requests
 
-# Load the tokenizer used during fine-tuning
-tokenizer = AutoTokenizer.from_pretrained('yiyanghkust/finbert-pretrain')
+API_KEY = st.secrets["HUGGING_FACE_API"]
 
-# Load your saved fine-tuned model
-model_path = "likith123/SSAF-FinBert"
-model = AutoModelForSequenceClassification.from_pretrained(model_path)
-
-# Define function for sentiment prediction
-def predict_sentiment(input_text):
-    # Tokenize the input text
-    inputs = tokenizer(input_text, return_tensors="pt", truncation=True, padding=True, max_length=512)
-
-    # Perform inference
-    with torch.no_grad():
-        outputs = model(**inputs)
-
-    # Get predicted probabilities for each class
-    predicted_probs = torch.softmax(outputs.logits, dim=1).squeeze().tolist()
-
-    return predicted_probs
+# Define Hugging Face API URL and authorization headers
+API_URL = "https://api-inference.huggingface.co/models/likith123/SSAF-FinBert"
+headers = {"Authorization": f"Bearer {API_KEY}"}
 
 # Streamlit UI
 def main():
@@ -36,22 +20,47 @@ def main():
         # Combine headline and content
         combined_text = headline + " " + content
 
-        # Perform sentiment prediction
-        predicted_probs = predict_sentiment(combined_text)
+        # Make the API request with tokenized input
+        output = query({"inputs": combined_text})
 
-        # Map the predicted probabilities to sentiment labels
+        # Map labels to sentiment categories
         label_map = {0: 'Negative', 1: 'Neutral', 2: 'Positive'}
+        scores = output[0]
 
         # Display predicted sentiment percentages
         st.subheader("Predicted Sentiment:")
-        sorted_sentiments = sorted(zip(label_map.values(), predicted_probs), key=lambda x: x[1], reverse=True)
-        for sentiment_label, prob in sorted_sentiments:
-            if sentiment_label == 'Positive':
-                st.write(f"{sentiment_label.capitalize()} ✅:- {prob * 100:.2f}%", unsafe_allow_html=True)
-            elif sentiment_label == 'Negative':
-                st.write(f"{sentiment_label.capitalize()} ❌:- {prob * 100:.2f}%", unsafe_allow_html=True)
-            else:
-                st.write(f"{sentiment_label.capitalize()} ⏳:- {prob * 100:.2f}%", unsafe_allow_html=True)
+
+# Ensure the output is not empty
+        if output:
+            predictions = output[0]
+
+    # Define the mapping between labels and sentiment categories
+            label_map = {'LABEL_0': 'Negative', 'LABEL_1': 'Neutral', 'LABEL_2': 'Positive'}
+
+    # Sort the predictions based on score in descending order
+            sorted_predictions = sorted(predictions, key=lambda x: x['score'], reverse=True)
+
+    # Display each sentiment category along with its score
+            for prediction in sorted_predictions:
+                label = prediction['label']
+                sentiment_label = label_map.get(label, 'Unknown')
+                score = prediction['score'] * 100
+        
+        # Display sentiment label with appropriate emoji and percentage
+                if sentiment_label == 'Positive':
+                    st.write(f"{sentiment_label.capitalize()} ✅:- {score:.2f}%", unsafe_allow_html=True)
+                elif sentiment_label == 'Negative':
+                    st.write(f"{sentiment_label.capitalize()} ❌:- {score:.2f}%", unsafe_allow_html=True)
+                else:
+                    st.write(f"{sentiment_label.capitalize()} ⏳:- {score:.2f}%", unsafe_allow_html=True)
+        else:
+            st.write("No sentiment prediction available.")
+
+
+# Function to make API request
+def query(payload):
+    response = requests.post(API_URL, headers=headers, json=payload)
+    return response.json()
 
 if __name__ == "__main__":
     main()
