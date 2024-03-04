@@ -1,4 +1,3 @@
-Certainly! Below is a detailed README.md content for your repository:
 
 ---
 
